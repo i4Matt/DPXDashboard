@@ -373,7 +373,46 @@
             sendRequest('/commandButtonRow610');
         })
 
-        // Call fetchLogs to display logs when the page loads
+        // ROW 7
+        const commandButtonRow71 = document.getElementById('commandButtonRow71');
+        const commandButtonRow72 = document.getElementById('commandButtonRow72');
+        const commandButtonRow73 = document.getElementById('commandButtonRow73');
+        const commandButtonRow74 = document.getElementById('commandButtonRow74');
+        const commandButtonRow75 = document.getElementById('commandButtonRow75');
+
+        commandButtonRow71.addEventListener('click', () => {
+            sendRequest('/commandButtonRow71');
+        })
+
+        commandButtonRow72.addEventListener('click', () => {
+            sendRequest('/commandButtonRow72');
+        })
+
+        commandButtonRow73.addEventListener('click', () => {
+            sendRequest('/commandButtonRow73');
+        })
+
+        commandButtonRow74.addEventListener('click', () => {
+            sendRequest('/commandButtonRow74');
+        })
+
+        commandButtonRow75.addEventListener('click', () => {
+            sendRequest('/commandButtonRow75');
+        })  
+
+        // Function to set up Socket.IO and handle incoming text updates
+        function initializeSocketConnection() {
+        const socket = io();
+
+        // Listen for the 'updateTextbox' event from the server
+        socket.on('generated-key', (text) => {
+            document.getElementById('commandTextArea').value = text;
+            });
+        }
+
+        // Initialize the Socket.IO connection on page load
+        window.onload = initializeSocketConnection;
+
         fetchLogs();
     </script>
 </body>

@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const app = express();
 const fs = require('fs');
@@ -13,6 +11,9 @@ function myDebug(message){if(true){console.log(message)}} // DEBUG MENUES
 // Create the HTTP server and attach socket.io to it
 const server = http.createServer(app);
 const io = socketIo(server); // Set up socket.io
+
+let generatedKey, streamKey1 = generateRandomString(16), streamKey2 = generateRandomString(16), streamKey3 = generateRandomString(16), streamKey4 = generateRandomString(16);
+const port = 64197;
 
 // HTML location to run the frontend
 app.use(express.static('../Client'));
@@ -64,13 +65,13 @@ client.on('message', (channel, userstate, message, self) => {
 
     //console.log(`Message from ${userstate.username}: ${message}`);
 
-    console.log(userstate);
     // !! MODERATION !! //
     swearScoreOffence(channel, userstate, calculateSwearScore(message));
 
     // !! USER COMMANDS !! //
     // COMMANDS THAT ANYONE CAN USE.
-    userCommands(channel, userstate, message);
+    userCommands(channel, message);
+
 
     if(userstate.mod){
         modCommands(channel, userstate, message);
@@ -80,7 +81,7 @@ client.on('message', (channel, userstate, message, self) => {
 
 
 // USER COMMANDS
-function userCommands(channel, userstate, message){
+function userCommands(channel, message){
     if(message.toLowerCase() === "!charity" || message.toLowerCase() === "!charitie" || message.toLowerCase() === "!charities" || message.toLowerCase() === "!twloha" || message.toLowerCase() === "!dpx") {
         command('!CHARITY');
         client.say(channel, "Dog Pound Expo is raising money to support To Write Love on Her Arms. Your gift will make it possible to connect people to hope and help. Your story matters. To learn more about TWLOHA, visit https://twloha.com/.");
@@ -216,9 +217,17 @@ function calculateSwearScore(inputString) {
 // CHECKS IF THE USER SHOULD BE TIMED OUT OR BANNED
 function swearScoreOffence(channel, userstate, score){
     if (score => 25){ // USER WILL BE BANNED
-
+        if(checkAndAddUsername(userstate.username)){
+            // BAN USER
+        } else{
+            // LARGE TIMEOUT FOR USER
+        }
     } else if (score => 15){ // USER WILL BE TIMED OUT
-        checkAndAddUsername(userstate.username);
+        if(checkAndAddUsername(userstate.username)){
+            // TIMEOUT USER
+        } else{
+            // WARN USER
+        }
     }
 }
 
@@ -255,6 +264,7 @@ async function changeScene(sceneName) {
         // Send the "SetCurrentScene" request to change the scene
         const response = await obs.call('SetCurrentProgramScene', { 'sceneName': sceneName});
         console.log(`Scene changed to: ${sceneName}`, response);
+        console.log();
 
     } catch (err) {
         console.error('Failed to connect or change scene:', err);
@@ -292,6 +302,7 @@ async function updateStreamTitle(newTitle) {
       // Check for a successful response without assuming JSON content
       if (response.ok) {
         console.log(`Successfully updated title to: "${newTitle}"`);
+        addLogEntry(`Successfully updated title to: "${newTitle}"`);
       } else {
         const errorText = await response.text(); // Log the raw error response
         console.error('Error updating title:', errorText);
@@ -364,6 +375,7 @@ async function updateStreamGame(newGame) {
       // Check for a successful response without assuming JSON content
       if (response.ok) {
         console.log(`Successfully updated game to: "${newGame}"`);
+        addLogEntry(`Successfully updated game to: "${newGame}"`);
       } else {
         const errorText = await response.text(); // Log the raw error response
         console.error('Error updating game:', errorText);
@@ -392,28 +404,28 @@ function streamInfoUpdate(index){
 // ----- STREAMING INTEGRATION ENDS HERE ----- //
 
 
+//#region BUTTON INTEGRATION
 // ----- BUTTON INEGRATION STARTS HERE ----- //
-
 // ~~~ TOP LEFT BUTTONS START ~~~ //
 
 // Get current game data
 app.get('/scheduleCurrent', (req, res) => {
     currentGame++;  // Move forward
-    handleLogRequest('resources/Schedule.json', currentGame, res);
+    handleLogRequest('../resources/schedule.json', currentGame, res);
     streamInfoUpdate(currentGame);
 });
 
 // Get next game data
 app.get('/scheduleNext', (req, res) => {
     nextGame++;  // Move forward
-    handleLogRequest('resources/Schedule.json', nextGame, res);
+    handleLogRequest('../resources/schedule.json', nextGame, res);
 });
 
 // Get previous current game data (backwards)
 app.get('/scheduleCurrentBack', (req, res) => {
     if (currentGame > 0) {
         currentGame--;
-        handleLogRequest('resources/Schedule.json', currentGame, res);
+        handleLogRequest('../resources/schedule.json', currentGame, res);
         streamInfoUpdate(currentGame);
     } else {
         res.send('No previous game data available');
@@ -424,7 +436,7 @@ app.get('/scheduleCurrentBack', (req, res) => {
 app.get('/scheduleNextBack', (req, res) => {
     if (nextGame > 0) {
         nextGame--;
-        handleLogRequest('resources/Schedule.json', nextGame, res);
+        handleLogRequest('../resources/schedule.json', nextGame, res);
     } else {
         res.send('No previous next game data available');
     }
@@ -433,11 +445,28 @@ app.get('/scheduleNextBack', (req, res) => {
 
 // ~~~ BOTTOM LEFT BUTTONS ~~~ //
 
-// ROW 3
+// ROW 1
+app.get('/commandButtonRow11', (req, res) => {
+    changeScene('Transition');
+});
+
+app.get('/commandButtonRow12', (req, res) => {
+    changeScene('Transition w/ Words on Stream');
+});
+
+// ROW 2
+app.get('/commandButtonRow21', (req, res) => {
+    changeScene('Interview');
+});
+
+app.get('/commandButtonRow22', (req, res) => {
+    changeScene('Podcast');
+});
+
+// ROW 3 | 16:9 SCENES
 app.get('/commandButtonRow31', (req, res) => {
     myDebug("/commandButtonRow31 activated");
     changeScene('16:9 One Runner');
-    res.send('Completed')
 })
 
 app.get('/commandButtonRow32', (req, res) => {
@@ -451,9 +480,103 @@ app.get('/commandButtonRow33', (req, res) => {
 app.get('/commandButtonRow34', (req, res) => {
     changeScene('16:9 Four Runners');
 })
-// ~~~ BOTTOM LEFT BUTTONS END ~~~ //
 
+// ROW 4 | 4:3 SCENES
+app.get('/commandButtonRow41', (req, res) => {
+    changeScene('4:3 One Runner');
+});
+
+app.get('/commandButtonRow42', (req, res) => {
+    changeScene('4:3 Two Runners');
+});
+
+app.get('/commandButtonRow43', (req, res) => {
+    changeScene('4:3 Three Runners');
+});
+
+app.get('/commandButtonRow44', (req, res) => {
+    changeScene('4:3 Four Runners');
+});
+
+// ROW 5 | 3:2 SCENES
+app.get('/commandButtonRow51', (req, res) => {
+    changeScene('3:2 One Runner');
+});
+
+app.get('/commandButtonRow52', (req, res) => {
+    changeScene('3:2 Two Runners');
+});
+
+app.get('/commandButtonRow53', (req, res) => {
+    changeScene('3:2 Three Runners');
+});
+
+app.get('/commandButtonRow54', (req, res) => {
+    changeScene('3:2 Four Runners');
+});
+
+// ROW 6 channel: #dogpoundspeedrunning
+app.get('/commandButtonRow61', (req, res) => {
+    userCommands("#dogpoundspeedrunning", "!donate")
+});
+
+app.get('/commandButtonRow62', (req, res) => {
+    userCommands("#dogpoundspeedrunning", "!charity")
+});
+
+app.get('/commandButtonRow63', (req, res) => {
+    userCommands("#dogpoundspeedrunning", "!socials")
+});
+
+app.get('/commandButtonRow64', (req, res) => {
+});
+
+app.get('/commandButtonRow65', (req, res) => {
+});
+
+app.get('/commandButtonRow66', (req, res) => {
+});
+
+app.get('/commandButtonRow67', (req, res) => {
+});
+
+app.get('/commandButtonRow68', (req, res) => {
+});
+
+app.get('/commandButtonRow69', (req, res) => {
+});
+
+app.get('/commandButtonRow610', (req, res) => {
+});
+
+// ROW 7
+app.get('/commandButtonRow71', (req, res) => {
+    generatedKey = generateRandomString(16);
+    sendTextToClient('generated-key', generatedKey);
+})
+
+app.get('/commandButtonRow72', (req, res) => {
+    streamKey1 = generatedKey;
+    addLogEntry("Stream Key 1 Updated to: " + generatedKey);
+})
+
+app.get('/commandButtonRow73', (req, res) => {
+    streamKey2 = generatedKey;
+    addLogEntry("Stream Key 2 Updated to: " + generatedKey);
+})
+
+app.get('/commandButtonRow74', (req, res) => {
+    streamKey3 = generatedKey;
+    addLogEntry("Stream Key 3 Updated to: " + generatedKey);
+})
+
+app.get('/commandButtonRow75', (req, res) => {
+    streamKey4 = generatedKey;
+    addLogEntry("Stream Key 4 Updated to: " + generatedKey);
+})
+// ~~~ BOTTOM LEFT BUTTONS END ~~~ //
 // ----- BUTTON INTEGRATION ENDS HERE ----- //
+//#endregion
 
 // Function to get data from the JSON file by index
 
@@ -560,8 +683,6 @@ function handleLogRequest(jsonFile, currentLine, response) {
     });
 }
 
-
-
 // Server route to get the logs
 app.get('/logs', (req, res) => {
     res.json(logs); // Send the logs as JSON
@@ -583,8 +704,74 @@ app.post('/add-log', (req, res) => {
     res.status(200).send('Log added successfully');
 });
 
-// Start the server
-const PORT = process.env.PORT || 64197;
+function generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!';
+    let result = '';
+    
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters[randomIndex];
+    }
+    
+    return result;
+  }
+
+  // SEND TEXT TO FRONT
+  function sendTextToClient(location, text) {
+    io.emit(location, text);
+  }
+  
+  // Set up Socket.IO connection event
+  io.on('connection', (socket) => {
+    console.log('A client connected:', socket.id);
+  
+    // Optionally send a welcome message immediately upon connection
+    sendTextToClient('Hello from the backend via Socket.IO!');
+  
+    // Handle disconnection
+    socket.on('disconnect', () => {
+      console.log('Client disconnected:', socket.id);
+    });
+  });
+// ----- IDK WHERE THIS FITS ENDS ----- //
+
+
+
+// ----- EXPRESS STUFF STARTS HERE ----- //
+
+// ~~~ URL REDIRECTS START ~~~ //
+
+// Redirect from '/old-page1' to '/new-page1'
+app.get('/rtmp1', (req, res) => {
+    res.redirect('rtmp://192.168.1.150/live/' + streamKey1);
+  });
+  
+  // Redirect from '/old-page2' to '/new-page2'
+  app.get('/rtmp2', (req, res) => {
+    res.redirect('rtmp://192.168.1.150/live/' + streamKey2);
+  });
+  
+  // Redirect from '/old-page3' to an external URL
+  app.get('/rtmp3', (req, res) => {
+    res.redirect('rtmp://192.168.1.150/live/' + streamKey3);
+  });
+  
+  // Redirect from '/old-page4' to '/new-page4' with a permanent 301 status
+  app.get('/rtmp4', (req, res) => {
+    res.redirect('rtmp://192.168.1.150/live/' + streamKey4);
+  });
+  
+  // Routes for new pages (optional, for testing purposes)
+  app.get('/rtmp1', (req, res) => res.send('This is New Page 1'));
+  app.get('/rtmp2', (req, res) => res.send('This is New Page 2'));
+  app.get('/rtmp3', (req, res) => res.send('This is New Page 3'));
+  app.get('/rtmp4', (req, res) => res.send('This is New Page 4'));
+
+// ~~~ URL REDIRECTS END ~~~ //
+
+// STARTS THE SERVER
+const PORT = process.env.PORT || port;
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    console.log()
 });
