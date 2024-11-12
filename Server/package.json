@@ -1,0 +1,19 @@
+{
+  "name": "dpxDashboard",
+  "version": "0.1.0",
+  "description": "Dashboard to help run DPX easier.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app",
+    "dev": "nodemon app"
+  },
+  "author": "Matthew Houle",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "obs-websocket-js": "^5.0.6",
+    "socket.io": "^4.8.1",
+    "tmi.js": "^1.8.5"
+  }
+}

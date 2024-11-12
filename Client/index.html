@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPX DASHBOARD</title>
+    <link rel="stylesheet" type="text/css" href="style.css"> <!-- Link to updated CSS -->
+</head>
+<body>
+    <div class="main-content">
+        <!-- Left Side: Buttons and Textboxes -->
+        <div class="Left-Container">
+            <div class="main-container">
+                <div class="button-textbox-container">
+                    <button id="logButton1" class="update-button">Update Current Game</button>
+                    <button id="logButtonBack1" class="update-button">Previous Current Game</button>
+                    <textarea id="logTextBox1" class="log-textbox" placeholder="Contents of the current game file will appear here..." readonly></textarea>
+                </div>
+    
+                <div class="button-textbox-container">
+                    <button id="logButton2" class="update-button">Update Up Next</button>
+                    <button id="logButtonBack2" class="update-button">Previous Up Next</button>
+                    <textarea id="logTextBox2" class="log-textbox" placeholder="Contents of the next game file will appear here..." readonly></textarea>
+                </div>
+    
+                <!-- New Buttons for Going Backward -->
+            </div>
+
+            <div class="bottom-left-container">
+                <div class="dashboard-commands">
+                    <div class="dashboard-commands-row">
+                        <button id="commandButtonRow11" class="command-button-top"> Transition Screen </button>
+                        <button id="commandButtonRow12" class="command-button-top"> Transition Screen w/ Words on Stream</button>
+                    </div>
+                    <div class="dashboard-commands-row">
+                        <button id="commandButtonRow21" class="command-button-top"> Interview </button>
+                        <button id="commandButtonRow22" class="command-button-top"> Podcast</button>
+                    </div>
+                    <div class="dashboard-commands-row">
+                        <button id="commandButtonRow31" class="command-button"> 16:9 Sing</button>
+                        <button id="commandButtonRow32" class="command-button"> 16:9 Doub</button>
+                        <button id="commandButtonRow33" class="command-button"> 16:9 Trio</button>
+                        <button id="commandButtonRow34" class="command-button"> 16:9 Quad</button>
+                    </div>
+                    <div class="dashboard-commands-row">
+                        <button id="commandButtonRow41" class="command-button"> 4:3 Sing</button>
+                        <button id="commandButtonRow42" class="command-button"> 4:3 Doub</button>
+                        <button id="commandButtonRow43" class="command-button"> 4:3 Trio</button>
+                        <button id="commandButtonRow44" class="command-button"> 4:3 Quad</button>
+                    </div>
+                    <div class="dashboard-commands-row">
+                        <button id="commandButtonRow51" class="command-button"> 3:2 Sing</button>
+                        <button id="commandButtonRow52" class="command-button"> 3:2 Doub</button>
+                        <button id="commandButtonRow53" class="command-button"> 3:2 Trio</button>
+                        <button id="commandButtonRow54" class="command-button"> 3:2 Quad</button>
+                    </div>
+
+                    <div class="dashboard-commands-row">
+                        <button id="commandButtonRow61" class="command-button-bottom"> !Donate</button>
+                        <button id="commandButtonRow62" class="command-button-bottom"> !Charity</button>
+                        <button id="commandButtonRow63" class="command-button-bottom"> !Socials</button>
+                        <button id="commandButtonRow64" class="command-button-bottom"> X</button>
+                        <button id="commandButtonRow65" class="command-button-bottom"> X</button>
+                        <button id="commandButtonRow66" class="command-button-bottom"> X</button>
+                        <button id="commandButtonRow67" class="command-button-bottom"> X</button>
+                        <button id="commandButtonRow68" class="command-button-bottom"> X</button>
+                        <button id="commandButtonRow69" class="command-button-bottom"> X</button>
+                        <button id="commandButtonRow610" class="command-button-bottom"> X</button>
+                    </div>
+                    <div class="dashboard-commands-row">
+                        <button id="commandButtonRow71" class="command-button-bottom">Gen Key</button>
+                        <Textarea id="commandTextArea" class="command-textarea-bottom" placeholder="Stream key will appear here..." readonly></Textarea>
+                        <button id="commandButtonRow72" class="command-button-bottom">RTMP 1</button>
+                        <button id="commandButtonRow73" class="command-button-bottom">RTMP 2</button>
+                        <button id="commandButtonRow74" class="command-button-bottom">RTMP 3</button>
+                        <button id="commandButtonRow75" class="command-button-bottom">RTMP 4</button>
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+        
+
+        <!-- Right Side: Stream and Log Section -->
+        <div class="stream-log-container">
+            <!-- Twitch Stream -->
+            <div class="stream-container">
+                <iframe src="https://player.twitch.tv/?channel=dogpoundspeedrunning&parent=localhost"
+                        width="100%" height="500" frameborder="0" allowfullscreen="true">
+                </iframe>
+            </div>
+
+            <!-- Log Section -->
+            <div class="log-section">
+                <h2>Log Section</h2>
+                <div id="logContainer">
+                    <!-- Log entries will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add response container for displaying loading or error messages -->
+    <div id="responseContainer"></div> <!-- Add this container if you want to show status messages -->
+
+    <!-- Include socket.io client -->
+    <script src="/socket.io/socket.io.js"></script> <!-- Include the socket.io client -->
+
+    <script>
+        // Connect to the socket.io server
+        const socket = io();
+
+        // Listen for 'newLog' events and add the log to the UI
+        socket.on('newLog', (message) => {
+            addLogEntry(message); // Add the log entry to the log container
+        });
+
+        // Function to send log entry to the server and update the UI
+        function sendLogEntry(message) {
+            fetch('/add-log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Log added:', data);
+                
+                // After adding the log, fetch the updated logs from the server and update the UI
+                fetchLogs();
+            })
+            .catch(error => {
+                console.error('Error adding log:', error);
+            });
+        }
+
+        // Function to fetch logs from the server and update the UI
+        function fetchLogs() {
+            fetch('/logs')
+                .then(response => response.json())
+                .then(logs => {
+                    const logContainer = document.getElementById('logContainer');
+                    logContainer.innerHTML = ''; // Clear existing logs
+
+                    logs.forEach(log => {
+                        const logEntry = document.createElement('div');
+                        logEntry.textContent = log;
+                        logContainer.insertBefore(logEntry, logContainer.firstChild);  // Prepend log entry
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching logs:', error);
+                });
+        }
+
+        // Function to fetch and update the correct text box
+        function sendRequest(route) {
+            fetch(route)
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Data received:', data);
+                    // Update the correct text box based on the route
+                    if (route === '/scheduleCurrent' || route === '/scheduleCurrentBack') {
+                        logTextBox1.value = data.trim();  // Update text box 1 with current game data
+                    } else if (route === '/scheduleNext' || route === '/scheduleNextBack') {
+                        logTextBox2.value = data.trim();  // Update text box 2 with next game data
+                    }
+
+                    // Optionally, add a log entry
+                    //addLogEntry(`Data received: ${data.trim()}`);
+                })
+                .catch(error => {
+                    console.error('Error occurred:', error);
+                });
+        }
+
+
+        // Function to add new log entries to the top of the log container and remove the first log if more than 50
+        function addLogEntry(message) {
+            const logContainer = document.getElementById('logContainer');
+            
+            // Create a new log entry
+            const logEntry = document.createElement('div');
+            logEntry.textContent = message;
+
+            // Add the new log entry at the top of the container using insertBefore
+            logContainer.insertBefore(logEntry, logContainer.firstChild);
+
+            // Check if there are more than 50 logs
+            if (logContainer.children.length > 50) {
+                // Remove the last (oldest) log entry from the container
+                logContainer.removeChild(logContainer.lastChild);
+            }
+
+            console.log('Number of logs after update:', logContainer.children.length);
+        }
+
+        // Example usage: Add a new log entry when the button is clicked
+        const logButton1 = document.getElementById('logButton1');
+        const logButton2 = document.getElementById('logButton2');
+        const logTextBox1 = document.getElementById('logTextBox1');
+        const logTextBox2 = document.getElementById('logTextBox2');
+
+        logButton1.addEventListener('click', () => {
+            const message = 'New log entry: Update Current Game clicked';
+            sendRequest('/scheduleCurrent');  // Fetch and update the first text box with current game data
+        });
+
+        logButton2.addEventListener('click', () => {
+            const message = 'New log entry: Update Up Next clicked';
+            sendRequest('/scheduleNext');  // Fetch and update the second text box with next game data
+        });
+
+        // Add event listeners for the new "Previous" buttons
+        const logButtonBack1 = document.getElementById('logButtonBack1');
+        const logButtonBack2 = document.getElementById('logButtonBack2');
+
+        // Event listener for the Previous Current Game button
+        logButtonBack1.addEventListener('click', () => {
+            sendRequest('/scheduleCurrentBack');  // Fetch and update the first text box with previous current game data
+        });
+
+        // Event listener for the Previous Up Next button
+        logButtonBack2.addEventListener('click', () => {
+            sendRequest('/scheduleNextBack');  // Fetch and update the second text box with previous next game data
+        });
+
+
+        // ~~~ BOTTOME LEFT CORNER BUTTONS ~~~ //
+        const commandButtonRow11 = document.getElementById('commandButtonRow11');
+        const commandButtonRow12 = document.getElementById('commandButtonRow12');
+
+        // ROW 1
+        commandButtonRow11.addEventListener('click', () => {
+            sendRequest('/commandButtonRow11');
+        })
+
+        commandButtonRow12.addEventListener('click', () => {
+            sendRequest('/commandButtonRow12');
+        })
+
+        // ROW 2
+        const commandButtonRow21 = document.getElementById('commandButtonRow21');
+        const commandButtonRow22 = document.getElementById('commandButtonRow22');
+
+        commandButtonRow21.addEventListener('click', () => {
+            sendRequest('/commandButtonRow21');
+        })
+
+        commandButtonRow22.addEventListener('click', () => {
+            sendRequest('/commandButtonRow22');
+        })
+
+        // ROW 3
+        const commandButtonRow31 = document.getElementById('commandButtonRow31');
+        const commandButtonRow32 = document.getElementById('commandButtonRow32');
+        const commandButtonRow33 = document.getElementById('commandButtonRow33');
+        const commandButtonRow34 = document.getElementById('commandButtonRow34');
+
+        commandButtonRow31.addEventListener('click', () => {
+            sendRequest('/commandButtonRow31');
+        })
+
+        commandButtonRow32.addEventListener('click', () => {
+            sendRequest('/commandButtonRow32');
+        })
+
+        commandButtonRow33.addEventListener('click', () => {
+            sendRequest('/commandButtonRow33');
+        })
+
+        commandButtonRow34.addEventListener('click', () => {
+            sendRequest('/commandButtonRow34');
+        })
+
+        // ROW 4
+        const commandButtonRow41 = document.getElementById('commandButtonRow41');
+        const commandButtonRow42 = document.getElementById('commandButtonRow42');
+        const commandButtonRow43 = document.getElementById('commandButtonRow43');
+        const commandButtonRow44 = document.getElementById('commandButtonRow44');
+
+        commandButtonRow41.addEventListener('click', () => {
+
+            sendRequest('/commandButtonRow41');
+        })
+
+        commandButtonRow42.addEventListener('click', () => {
+            sendRequest('/commandButtonRow42');
+        })
+
+        commandButtonRow43.addEventListener('click', () => {
+            sendRequest('/commandButtonRow43');
+        })
+
+        commandButtonRow44.addEventListener('click', () => {
+            sendRequest('/commandButtonRow44');
+        })
+
+        // ROW 5
+        const commandButtonRow51 = document.getElementById('commandButtonRow51');
+        const commandButtonRow52 = document.getElementById('commandButtonRow52');
+        const commandButtonRow53 = document.getElementById('commandButtonRow53');
+        const commandButtonRow54 = document.getElementById('commandButtonRow54');
+
+        commandButtonRow51.addEventListener('click', () => {
+            sendRequest('/commandButtonRow51');
+        })
+
+        commandButtonRow52.addEventListener('click', () => {
+            sendRequest('/commandButtonRow52');
+        })
+
+        commandButtonRow53.addEventListener('click', () => {
+            sendRequest('/commandButtonRow53');
+        })
+
+        commandButtonRow54.addEventListener('click', () => {
+            sendRequest('/commandButtonRow54');
+        })
+
+        // ROW 6
+        const commandButtonRow61 = document.getElementById('commandButtonRow61');
+        const commandButtonRow62 = document.getElementById('commandButtonRow62');
+        const commandButtonRow63 = document.getElementById('commandButtonRow63');
+        const commandButtonRow64 = document.getElementById('commandButtonRow64');
+        const commandButtonRow65 = document.getElementById('commandButtonRow65');
+        const commandButtonRow66 = document.getElementById('commandButtonRow66');
+        const commandButtonRow67 = document.getElementById('commandButtonRow67');
+        const commandButtonRow68 = document.getElementById('commandButtonRow68');
+        const commandButtonRow69 = document.getElementById('commandButtonRow69');
+        const commandButtonRow610 = document.getElementById('commandButtonRow610');
+
+        commandButtonRow61.addEventListener('click', () => {
+            sendRequest('/commandButtonRow61');
+        })
+
+        commandButtonRow62.addEventListener('click', () => {
+            sendRequest('/commandButtonRow62');
+        })
+
+        commandButtonRow63.addEventListener('click', () => {
+            sendRequest('/commandButtonRow63');
+        })
+
+        commandButtonRow64.addEventListener('click', () => {
+            sendRequest('/commandButtonRow64');
+        })
+
+        commandButtonRow65.addEventListener('click', () => {
+            sendRequest('/commandButtonRow65');
+        })
+
+        commandButtonRow66.addEventListener('click', () => {
+            sendRequest('/commandButtonRow66');
+        })
+
+        commandButtonRow67.addEventListener('click', () => {
+            sendRequest('/commandButtonRow67');
+        })
+
+        commandButtonRow68.addEventListener('click', () => {
+            sendRequest('/commandButtonRow68');
+        })
+
+        commandButtonRow69.addEventListener('click', () => {
+            sendRequest('/commandButtonRow69');
+        })
+
+        commandButtonRow610.addEventListener('click', () => {
+            sendRequest('/commandButtonRow610');
+        })
+
+        // Call fetchLogs to display logs when the page loads
+        fetchLogs();
+    </script>
+</body>
+</html>

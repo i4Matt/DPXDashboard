@@ -1,0 +1,216 @@
+/* Prevent page scrolling by setting html and body height to 100% */
+html, body {
+    height: 100%;
+    overflow: hidden; /* Prevent scrolling */
+}
+
+/* Main content container */
+.main-content {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    height: 100vh;
+    padding: 20px;
+}
+
+/* Container for buttons and text areas */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.Left-Container{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 40%;
+}
+
+.bottom-left-container{
+    width: 100%;
+}
+
+.dashboard-commands-row{
+    margin-top: 5px
+}
+
+/* Container for button and corresponding textarea */
+.button-textbox-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.dashboard-commands-row1 {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Style for the buttons */
+.update-button {
+    color: white;
+    width: 100%;
+    height: 50px;
+    padding: 0;
+    border: none;
+    background-color: green;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+}
+
+.command-button-top {
+    color: white;
+    width: 49.5%;
+    height: 50px;
+    padding: 0;
+    border: none;
+    background-color: darkgreen;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+}
+
+.command-button {
+    color: white;
+    width: 24.5%;
+    height: 50px;
+    padding: 0;
+    border: none;
+    background-color: darkblue;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+}
+
+.command-button-bottom{
+    color: white;
+    width: 9.48%;
+    height: 50px;
+    padding: 0;
+    border: none;
+    background-color: black;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+}
+
+.command-textarea-bottom{
+    color: white;
+    width: 49.62%;
+    height: 40px;
+    padding: 0;
+    border: none;
+    background-color: black;
+    text-align: left;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    vertical-align: middle;
+
+    margin-top: 10px;
+    padding: 5px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    resize: none;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: pre-wrap;
+    text-overflow: ellipsis;
+}
+
+/* Specific color for the second button */
+#logButton2 {
+    background-color: blue;
+}
+
+#logButtonBack2 {
+    background-color: darkred;
+}
+
+#logButtonBack1 {
+    background-color: darkred;
+}
+
+/* Style for textareas */
+.log-textbox {
+    width: 100%;
+    height: 100px;
+    margin-top: 10px;
+    padding: 5px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    resize: none;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: pre-wrap;
+    text-overflow: ellipsis;
+}
+
+/* Right Side Container for Stream and Log Section */
+.stream-log-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the left side */
+    margin-left: 30px;
+    margin-right: 25px;
+    width: 60%;  /* Stream and log section take up 60% of the page */
+    height: 100vh;  /* Full height of the window */
+    justify-content: flex-start;  /* Align elements at the top */
+    /*background-color: red; */
+}
+
+/* Stream container */
+.stream-container {
+    width: 100%;  /* Full width for the stream */
+    height: auto; /* Let the stream take its natural height */
+    margin-bottom: 10px;  /* Space between the stream and log section */
+}
+
+/* Log Section Below Twitch Stream */
+.log-section {
+    display: flex;
+    flex-direction: column; /* Stack log entries from top to bottom */
+    width: 100%;  /* Log section takes up the full width */
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 35%;  /* Set a fixed height for the log section */
+    margin-top: -5px;  /* Small margin to create space between stream and log section */
+    overflow-y: auto;  /* Allow scrolling if the content exceeds the height */
+    background-color: #2d2d2d;
+    color: #fff;
+    z-index: 10;
+}
+
+/* Style for the log section heading */
+.log-section h2 {
+    padding-top: 15px;  /* Increased padding to move the heading down a bit */
+    padding-bottom: 10px;  /* Added space below the heading */
+    padding-left: 15px;  /* Increased padding for better alignment */
+    margin: 0;  /* Remove default margin */
+    font-size: 22px;  /* Adjust font size for the heading */
+}
+
+/* Style for each log entry */
+#logContainer div {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;  /* Space between each log entry */
+    padding: 10px;  /* Padding inside each log entry */
+    background-color: #444;
+    border-radius: 5px;
+    width: 100%;  /* Ensure log entry takes full width */
+}
