@@ -79,7 +79,6 @@ client.on('message', (channel, userstate, message, self) => {
     
 });
 
-
 // USER COMMANDS
 function userCommands(channel, message){
     if(message.toLowerCase() === "!charity" || message.toLowerCase() === "!charitie" || message.toLowerCase() === "!charities" || message.toLowerCase() === "!twloha" || message.toLowerCase() === "!dpx") {

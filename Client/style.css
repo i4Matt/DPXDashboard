@@ -2,6 +2,7 @@
 html, body {
     height: 100%;
     overflow: hidden; /* Prevent scrolling */
+    background-color: black;
 }
 
 /* Main content container */
@@ -61,11 +62,16 @@ html, body {
     height: 50px;
     padding: 0;
     border: none;
-    background-color: green;
+    background-color: darkolivegreen;
     cursor: pointer;
     text-align: center;
     font-size: 16px;
     font-family: Arial, sans-serif;
+    align-items: center;
+}
+
+.update-button:hover {
+    margin-left: 5px;
 }
 
 .command-button-top {
@@ -81,6 +87,10 @@ html, body {
     font-family: Arial, sans-serif;
 }
 
+.command-button-top:hover {
+    background-color: green;
+}
+
 .command-button {
     color: white;
     width: 24.5%;
@@ -94,17 +104,25 @@ html, body {
     font-family: Arial, sans-serif;
 }
 
+.command-button:hover{
+    background-color: blue;
+}
+
 .command-button-bottom{
     color: white;
     width: 9.48%;
     height: 50px;
     padding: 0;
     border: none;
-    background-color: black;
+    background-color: darkslategrey;
     cursor: pointer;
     text-align: center;
     font-size: 16px;
     font-family: Arial, sans-serif;
+}
+
+.command-button-bottom:hover{
+    background-color: slategray;
 }
 
 .command-textarea-bottom{
@@ -113,7 +131,7 @@ html, body {
     height: 40px;
     padding: 0;
     border: none;
-    background-color: black;
+    background-color: darkslategrey;
     text-align: left;
     font-size: 16px;
     font-family: Arial, sans-serif;
@@ -124,7 +142,6 @@ html, body {
     font-size: 16px;
     font-family: Arial, sans-serif;
     resize: none;
-    border: 1px solid #ccc;
     box-sizing: border-box;
     overflow: hidden;
     white-space: pre-wrap;
@@ -133,7 +150,7 @@ html, body {
 
 /* Specific color for the second button */
 #logButton2 {
-    background-color: blue;
+    background-color: darkcyan;
 }
 
 #logButtonBack2 {
@@ -153,7 +170,8 @@ html, body {
     font-size: 14px;
     font-family: Arial, sans-serif;
     resize: none;
-    border: 1px solid #ccc;
+    background-color: darkslategrey;
+    color: white;
     box-sizing: border-box;
     overflow: hidden;
     white-space: pre-wrap;
@@ -187,7 +205,7 @@ html, body {
     width: 100%;  /* Log section takes up the full width */
     justify-content: flex-start;
     align-items: flex-start;
-    height: 35%;  /* Set a fixed height for the log section */
+    height: 39%;  /* Set a fixed height for the log section */
     margin-top: -5px;  /* Small margin to create space between stream and log section */
     overflow-y: auto;  /* Allow scrolling if the content exceeds the height */
     background-color: #2d2d2d;
