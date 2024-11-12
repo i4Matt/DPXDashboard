@@ -1,8 +1,7 @@
 # Ignore keys.json
 keys.json
 
-# Ignore all .txt files across the project
-*.txt
+
 
 # Node.js specific ignores (if you're using Node.js)
 node_modules/
@@ -21,10 +20,6 @@ logs/
 # Ignore temporary files and OS-specific files
 .DS_Store
 Thumbs.db
-
-# Ignore files in specific directories
-data/info/*.txt      # Ignore .txt files in /data/info
-resources/*.txt      # Ignore .txt files in /resources
 
 # macOS Finder attributes
 .AppleDouble
