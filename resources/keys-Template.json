@@ -1,0 +1,13 @@
+[{  "twitch":{
+        "oauthToken": "",
+        "clientId": "",
+        "channelId": ""
+    },
+    "twitchBot":{
+        "username": "",
+        "oauthToken": "oauth:"
+    },
+    "obs": {
+        "password": ""
+    }
+}]

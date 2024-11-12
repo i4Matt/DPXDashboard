@@ -1,7 +1,8 @@
 # Ignore keys.json
 keys.json
 
-
+# Ignore warnedUsers.json in the data directory
+data/warnedUsers.json
 
 # Node.js specific ignores (if you're using Node.js)
 node_modules/
