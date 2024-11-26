@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload - Schedule & Keys</title>
+    <link rel="stylesheet" href="style/upload.css"> <!-- Link to the renamed upload.css -->
+    <link rel="stylesheet" href="../style/upload.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload New Files</h1>
+
+        <!-- Schedule Upload Form -->
+        <h2>Upload Schedule</h2>
+        <form id="uploadScheduleForm" enctype="multipart/form-data">
+            <label for="scheduleUpload">Choose a new schedule file (schedule.json):</label>
+            <input type="file" id="scheduleUpload" name="scheduleUpload" accept=".json" required>
+            <button type="submit">Upload Schedule</button>
+            <button id="downloadScheduleTemplate">Download Schedule Template</button>
+        </form>
+
+        <!-- Keys Upload Form -->
+        <h2>Upload Keys</h2>
+        <form id="uploadKeysForm" enctype="multipart/form-data">
+            <label for="keysUpload">Choose a new keys file (keys.json):</label>
+            <input type="file" id="keysUpload" name="fileUpload" accept=".json" required>
+            <button type="submit">Upload Keys</button>
+            <button id="downloadKeysTemplate">Download Keys Template</button>
+        </form>
+        
+        
+
+        <!-- Status Message -->
+        <div id="statusMessage"></div>
+    </div>
+
+    <script>
+        // Schedule file upload handling
+        document.getElementById('uploadScheduleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let formData = new FormData();
+            formData.append('fileUpload', document.getElementById('scheduleUpload').files[0]);
+
+            fetch('/upload-schedule', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('statusMessage').innerText = data.message;
+                document.getElementById('statusMessage').style.color = 'green'; // Success color
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('statusMessage').innerText = 'Failed to upload the schedule file.';
+                document.getElementById('statusMessage').style.color = 'red'; // Error color
+            });
+        });
+
+        // Keys file upload handling
+        document.getElementById('uploadKeysForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let formData = new FormData();
+            formData.append('fileUpload', document.getElementById('keysUpload').files[0]);
+
+            fetch('/upload-keys', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('statusMessage').innerText = data.message;
+                document.getElementById('statusMessage').style.color = 'green'; // Success color
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('statusMessage').innerText = 'Failed to upload the keys file.';
+                document.getElementById('statusMessage').style.color = 'red'; // Error color
+            });
+        });
+
+        // Download the schedule template
+        document.getElementById('downloadScheduleTemplate').addEventListener('click', function() {
+            window.location.href = '/templates/schedule-template.json';
+        });
+
+        // Download the keys template
+        document.getElementById('downloadKeysTemplate').addEventListener('click', function() {
+            window.location.href = '/templates/keys-template.json';
+        });
+    </script>
+</body>
+</html>

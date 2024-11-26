@@ -1,10 +1,46 @@
 const express = require('express');
-const app = express();
 const fs = require('fs');
 const path = require('path');
 const tmi = require('tmi.js'); // Import tmi.js
 const http = require('http');
 const socketIo = require('socket.io'); // Import socket.io
+const multer = require('multer');
+
+const app = express();
+
+// ----- ----- //
+// Define the path to the keys.json file
+const keysFilePath = path.join(__dirname, '..', 'Resources', 'keys.json');
+
+// Check if keys.json exists, and if not, create it with default content
+if (!fs.existsSync(keysFilePath)) {
+    console.log('keys.json not found, creating a new one...');
+    
+    // Define default content with your structure
+    const defaultKeysData = [{
+        "twitch": {
+            "oauthToken": "",
+            "clientId": "",
+            "channelId": ""
+        },
+        "twitchBot": {
+            "username": "",
+            "oauthToken": ""
+        },
+        "obs": {
+            "password": ""
+        }
+    }];
+
+    // Write the default content to keys.json
+    fs.writeFileSync(keysFilePath, JSON.stringify(defaultKeysData, null, 2), 'utf8');
+    console.log('keys.json created with default values.');
+}
+// ----- ----- //
+
+
+// Set up multer to store uploaded files temporarily
+const upload = multer({ dest: 'uploads/' });
 
 function myDebug(message){if(true){console.log(message)}} // DEBUG MENUES
 
@@ -17,6 +53,7 @@ const port = 64197;
 
 // HTML location to run the frontend
 app.use(express.static('../Client'));
+//app.use(express.static('public'));
 
 // Middleware to parse JSON request bodies
 app.use(express.json());  // Ensure this is in place to parse JSON body
@@ -736,6 +773,120 @@ function generateRandomString(length) {
 
 
 
+// ----- MULTER STUFF STARTS HERE ----- //
+
+// Route to handle the download of schedule-template.json
+app.get('/templates/schedule-template.json', (req, res) => {
+    const filePath = path.join(__dirname, '..', 'Resources', 'templates', 'schedule-template.json');
+    if (fs.existsSync(filePath)) {
+        res.download(filePath, 'schedule-template.json', (err) => {
+            if (err) {
+                res.status(500).json({ message: 'Error downloading the schedule template' });
+            }
+        });
+    } else {
+        res.status(404).json({ message: 'Schedule template not found' });
+    }
+});
+
+// Route to handle the download of keys-template.json
+app.get('/templates/keys-template.json', (req, res) => {
+    const filePath = path.join(__dirname, '..', 'Resources', 'templates', 'keys-template.json');
+    if (fs.existsSync(filePath)) {
+        res.download(filePath, 'keys-template.json', (err) => {
+            if (err) {
+                res.status(500).json({ message: 'Error downloading the keys template' });
+            }
+        });
+    } else {
+        res.status(404).json({ message: 'Keys template not found' });
+    }
+});
+
+// Handle file upload route
+app.post('/upload-schedule', upload.single('fileUpload'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Define path for the existing schedule.json
+    const filePath = path.join(__dirname, '..', 'Resources', 'schedule.json');
+    
+    fs.readFile(req.file.path, 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error reading the uploaded file' });
+        }
+
+        try {
+            // Validate that it's a valid JSON
+            const jsonData = JSON.parse(data);
+
+            // Write the new schedule.json to the Resources folder
+            fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), 'utf8', (err) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error saving the new schedule' });
+                }
+
+                // Remove the temporary file after processing
+                fs.unlink(req.file.path, (err) => {
+                    if (err) console.error('Error deleting temp file:', err);
+                });
+
+                // Respond with success
+                return res.json({ message: 'Schedule updated successfully!' });
+            });
+
+        } catch (error) {
+            return res.status(400).json({ message: 'Invalid JSON file' });
+        }
+    });
+});
+
+
+// Route to upload the keys.json file
+app.post('/upload-keys', upload.single('fileUpload'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Define the path where keys.json should be saved
+    const filePath = path.join(__dirname, '..', 'Resources', 'keys.json');
+
+    // Read the uploaded file
+    fs.readFile(req.file.path, 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error reading the uploaded file' });
+        }
+
+        try {
+            // Ensure the uploaded file is valid JSON
+            const jsonData = JSON.parse(data);
+
+            // Save the new keys.json file
+            fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), 'utf8', (err) => {
+                if (err) {
+                    console.error('Error saving the new keys:', err);
+                    return res.status(500).json({ message: 'Error saving the new keys' });
+                }
+
+                // Remove the temporary file after processing
+                fs.unlink(req.file.path, (err) => {
+                    if (err) console.error('Error deleting temp file:', err);
+                });
+
+                // Respond with success message
+                return res.json({ message: 'Keys updated successfully!' });
+            });
+
+        } catch (error) {
+            return res.status(400).json({ message: 'Invalid JSON file' });
+        }
+    });
+});
+// ----- MULTER STUFF ENDS HERE ----- //
+
+
+
 // ----- EXPRESS STUFF STARTS HERE ----- //
 
 // ~~~ URL REDIRECTS START ~~~ //
@@ -766,6 +917,10 @@ app.get('/rtmp1', (req, res) => {
   app.get('/rtmp3', (req, res) => res.send('This is New Page 3'));
   app.get('/rtmp4', (req, res) => res.send('This is New Page 4'));
 
+  // Route for /admin to serve the admin.html page
+    app.get('/admin/upload', (req, res) => {
+        res.sendFile(path.join(__dirname, '../Client/upload.html')); // Serve the admin.html file
+    });
 // ~~~ URL REDIRECTS END ~~~ //
 
 // STARTS THE SERVER
