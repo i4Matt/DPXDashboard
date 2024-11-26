@@ -921,6 +921,11 @@ app.get('/rtmp1', (req, res) => {
     app.get('/admin/upload', (req, res) => {
         res.sendFile(path.join(__dirname, '../Client/upload.html')); // Serve the admin.html file
     });
+
+    // Route for /admin to serve the admin.html page
+    app.get('/', (req, res) => {
+        res.sendFile(path.join(__dirname, '../Client/index.html')); // Serve the admin.html file
+    });
 // ~~~ URL REDIRECTS END ~~~ //
 
 // STARTS THE SERVER
