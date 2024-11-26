@@ -10,7 +10,7 @@ const app = express();
 
 // ----- ----- //
 // Define the path to the keys.json file
-const keysFilePath = path.join(__dirname, '..', 'Resources', 'keys.json');
+const keysFilePath = path.join(__dirname, '..', 'resources', 'keys.json');
 
 // Check if keys.json exists, and if not, create it with default content
 if (!fs.existsSync(keysFilePath)) {
@@ -777,7 +777,7 @@ function generateRandomString(length) {
 
 // Route to handle the download of schedule-template.json
 app.get('/templates/schedule-template.json', (req, res) => {
-    const filePath = path.join(__dirname, '..', 'Resources', 'templates', 'schedule-template.json');
+    const filePath = path.join(__dirname, '..', 'resources', 'templates', 'schedule-template.json');
     if (fs.existsSync(filePath)) {
         res.download(filePath, 'schedule-template.json', (err) => {
             if (err) {
@@ -791,7 +791,7 @@ app.get('/templates/schedule-template.json', (req, res) => {
 
 // Route to handle the download of keys-template.json
 app.get('/templates/keys-template.json', (req, res) => {
-    const filePath = path.join(__dirname, '..', 'Resources', 'templates', 'keys-template.json');
+    const filePath = path.join(__dirname, '..', 'resources', 'templates', 'keys-template.json');
     if (fs.existsSync(filePath)) {
         res.download(filePath, 'keys-template.json', (err) => {
             if (err) {
@@ -810,7 +810,7 @@ app.post('/upload-schedule', upload.single('fileUpload'), (req, res) => {
     }
 
     // Define path for the existing schedule.json
-    const filePath = path.join(__dirname, '..', 'Resources', 'schedule.json');
+    const filePath = path.join(__dirname, '..', 'resources', 'schedule.json');
     
     fs.readFile(req.file.path, 'utf8', (err, data) => {
         if (err) {
@@ -821,7 +821,7 @@ app.post('/upload-schedule', upload.single('fileUpload'), (req, res) => {
             // Validate that it's a valid JSON
             const jsonData = JSON.parse(data);
 
-            // Write the new schedule.json to the Resources folder
+            // Write the new schedule.json to the resources folder
             fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), 'utf8', (err) => {
                 if (err) {
                     return res.status(500).json({ message: 'Error saving the new schedule' });
@@ -850,7 +850,7 @@ app.post('/upload-keys', upload.single('fileUpload'), (req, res) => {
     }
 
     // Define the path where keys.json should be saved
-    const filePath = path.join(__dirname, '..', 'Resources', 'keys.json');
+    const filePath = path.join(__dirname, '..', 'resources', 'keys.json');
 
     // Read the uploaded file
     fs.readFile(req.file.path, 'utf8', (err, data) => {
