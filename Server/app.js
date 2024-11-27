@@ -11,6 +11,8 @@ const app = express();
 // ----- ----- //
 // Define the path to the keys.json file
 const keysFilePath = path.join(__dirname, '..', 'resources', 'keys.json');
+const schedulePath = path.join(__dirname, '../resources/schedule.json');
+
 
 // Check if keys.json exists, and if not, create it with default content
 if (!fs.existsSync(keysFilePath)) {
@@ -425,7 +427,7 @@ async function updateStreamGame(newGame) {
 // HHHHHHHHHHHHHHHHHHHHHHHHHHHERE
 function streamInfoUpdate(index){
     console.log(index)
-    let currentGame = getDataByIndex(index, "../resources/schedule.json");
+    let currentGame = getDataByIndex(index, schedulePath);
     let additionals = readTextFile("../resources/additionals.txt");
 
     if (additionals != ""){additionals = additionals + " ";}
@@ -448,21 +450,21 @@ function streamInfoUpdate(index){
 // Get current game data
 app.get('/scheduleCurrent', (req, res) => {
     currentGame++;  // Move forward
-    handleLogRequest('../resources/schedule.json', currentGame, res);
+    handleLogRequest(schedulePath, currentGame, res);
     streamInfoUpdate(currentGame);
 });
 
 // Get next game data
 app.get('/scheduleNext', (req, res) => {
     nextGame++;  // Move forward
-    handleLogRequest('../resources/schedule.json', nextGame, res);
+    handleLogRequest(schedulePath, nextGame, res);
 });
 
 // Get previous current game data (backwards)
 app.get('/scheduleCurrentBack', (req, res) => {
     if (currentGame > 0) {
         currentGame--;
-        handleLogRequest('../resources/schedule.json', currentGame, res);
+        handleLogRequest(schedulePath, currentGame, res);
         streamInfoUpdate(currentGame);
     } else {
         res.send('No previous game data available');
@@ -473,7 +475,7 @@ app.get('/scheduleCurrentBack', (req, res) => {
 app.get('/scheduleNextBack', (req, res) => {
     if (nextGame > 0) {
         nextGame--;
-        handleLogRequest('../resources/schedule.json', nextGame, res);
+        handleLogRequest(schedulePath, nextGame, res);
     } else {
         res.send('No previous next game data available');
     }
