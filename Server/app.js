@@ -208,7 +208,7 @@ function cap(string) { // CAPITALIZES THE FIRST LETTER.
 // Function to check and add a username
 function checkAndAddUsername(username) {
     // Define the file path within the data directory
-    const filePath = path.join(__dirname, '../data/warnedUsers.json');
+    const filePath = path.join(__dirname, '../Client/data/warnedUsers.json');
     
     // Read the file synchronously
     const fileData = fs.readFileSync(filePath, 'utf8');
@@ -695,10 +695,10 @@ function handleLogRequest(jsonFile, currentLine, response) {
                 if (entry.hasOwnProperty(key)) {
                     formattedData += key + ": " + entry[key] + "\n";
 
-                    const filePath = path.join(__dirname, '../data/info', `current-${key}.txt`);
+                    const filePath = path.join(__dirname, '../Client/data/info', `current-${key}.txt`);
 
                     // Ensure the 'info' folder exists or create it
-                    const dirPath = path.join(__dirname, '../data/info');
+                    const dirPath = path.join(__dirname, '../Client/data/info');
                     if (!fs.existsSync(dirPath)) {
                         fs.mkdirSync(dirPath);
                     }
