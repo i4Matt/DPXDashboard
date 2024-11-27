@@ -292,7 +292,7 @@ async function changeScene(sceneName) {
 
     try {
         // Ensure the URL format is correct (using template literal)
-        const url = `ws://localhost:${port}`;  // Use the correct URL format
+        const url = `ws://192.168.1.100:${port}`;  // Use the correct URL format
 
         // Connect to OBS using the specified port and optional password
         await obs.connect(url, password);
