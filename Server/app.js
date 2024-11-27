@@ -457,7 +457,7 @@ app.get('/scheduleCurrent', (req, res) => {
 // Get next game data
 app.get('/scheduleNext', (req, res) => {
     nextGame++;  // Move forward
-    handleLogRequest(schedulePath, nextGame, res);
+    handleNextLogRequest(schedulePath, nextGame, res);
 });
 
 // Get previous current game data (backwards)
@@ -475,7 +475,7 @@ app.get('/scheduleCurrentBack', (req, res) => {
 app.get('/scheduleNextBack', (req, res) => {
     if (nextGame > 0) {
         nextGame--;
-        handleLogRequest(schedulePath, nextGame, res);
+        handleNextLogRequest(schedulePath, nextGame, res);
     } else {
         res.send('No previous next game data available');
     }
@@ -696,6 +696,52 @@ function handleLogRequest(jsonFile, currentLine, response) {
                     formattedData += key + ": " + entry[key] + "\n";
 
                     const filePath = path.join(__dirname, '../Client/data/info', `current-${key}.txt`);
+
+                    // Ensure the 'info' folder exists or create it
+                    const dirPath = path.join(__dirname, '../Client/data/info');
+                    if (!fs.existsSync(dirPath)) {
+                        fs.mkdirSync(dirPath);
+                    }
+
+                    // Write the data to the respective .txt file
+                    fs.writeFile(filePath, entry[key] + '\n', (writeErr) => {
+                        if (writeErr) {
+                            console.error(`Error writing to ${filePath}:`, writeErr);
+                        }
+                    });
+
+                    // Add log entry for successful file write
+                    //addLogEntry(`Data for ${key} written to .txt files`);
+                }
+            }
+
+            response.send(formattedData);
+        } else {
+            response.send('No more data to display');
+        }
+    });
+}
+
+function handleNextLogRequest(jsonFile, currentLine, response) {
+    fs.readFile(jsonFile, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error reading ${jsonFile}:`, err);
+            response.status(500).send(`Error reading ${jsonFile}`);
+            return;
+        }
+
+        const scheduleData = JSON.parse(data);
+
+        if (currentLine < scheduleData.length) {
+            const entry = scheduleData[currentLine];
+            let formattedData = "";
+
+            // Write each key-value pair to a separate .txt file
+            for (const key in entry) {
+                if (entry.hasOwnProperty(key)) {
+                    formattedData += key + ": " + entry[key] + "\n";
+
+                    const filePath = path.join(__dirname, '../Client/data/info', `next-${key}.txt`);
 
                     // Ensure the 'info' folder exists or create it
                     const dirPath = path.join(__dirname, '../Client/data/info');
