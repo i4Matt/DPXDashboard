@@ -52,7 +52,8 @@ let generatedKey, streamKey1 = generateRandomString(16), streamKey2 = generateRa
 const port = 64197;
 
 // HTML location to run the frontend
-app.use(express.static('../Client'));
+app.use(express.static(path.join(__dirname, '../Client')));
+//app.use(express.static('../Client'));
 //app.use(express.static('public'));
 
 // Middleware to parse JSON request bodies
@@ -924,7 +925,7 @@ app.get('/rtmp1', (req, res) => {
 
     // Route for /admin to serve the admin.html page
     app.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, '../Client/index.html')); // Serve the admin.html file
+        res.sendFile(path.join(__dirname, '../Client/', 'index.html')); // Serve the admin.html file
     });
 // ~~~ URL REDIRECTS END ~~~ //
 
