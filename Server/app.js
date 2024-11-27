@@ -51,7 +51,7 @@ const server = http.createServer(app);
 const io = socketIo(server); // Set up socket.io
 
 let generatedKey, streamKey1 = generateRandomString(16), streamKey2 = generateRandomString(16), streamKey3 = generateRandomString(16), streamKey4 = generateRandomString(16);
-const port = 80;
+const port = 443;
 
 // HTML location to run the frontend
 app.use(express.static(path.join(__dirname, '../Client')));
